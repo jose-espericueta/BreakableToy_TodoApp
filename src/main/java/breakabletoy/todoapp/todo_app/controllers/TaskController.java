@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/tasks")
 public class TaskController {
@@ -21,8 +22,10 @@ public class TaskController {
     }
 
     @GetMapping
-    public List<Task> getTasks(){
-        return taskService.getTasks();
+    public List<Task> getTasks(
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false) String sortOrder){
+        return taskService.getTasks(sortBy, sortOrder);
     }
 
     @PostMapping
@@ -35,7 +38,8 @@ public class TaskController {
         taskService.editTask(id, updatedTask);
     }
 
-    @DeleteMapping("{id}")
+    @CrossOrigin(origins = "http://localhost:3000")
+    @DeleteMapping("/{id}")
     public void deleteTask(@PathVariable Long id){
         taskService.deleteTask(id);
     }
@@ -67,16 +71,19 @@ public class TaskController {
         return taskService.sortedTasks(tasks, sortBy, sortOrder);
     }
 
+    @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping("/{id}/done")
     public void markAsDone(@PathVariable Long id){
         taskService.markAsDone(id);
     }
 
-    @PostMapping("/{id}/undone")
+    @CrossOrigin(origins = "http://localhost:3000")
+    @PutMapping("/{id}/undone")
     public void markAsUndone(@PathVariable Long id){
         taskService.markAsUndone(id);
     }
 
+    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/metrics")
     public TaskMetricsDTO calculateMetrics(){
         return taskService.calculateMetrics();

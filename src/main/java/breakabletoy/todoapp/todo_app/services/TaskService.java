@@ -26,9 +26,50 @@ public class TaskService {
 //        this.taskRepository = taskRepository;
 //    }
 
+    public List<Task> getTasks(String sortBy, String sortOrder){
+        List<Task> sortedTasks = new ArrayList<>(tasks);
+
+        List<String> sortFields = sortBy != null ? Arrays.asList(sortBy.split(",")) : Collections.emptyList();
+        List<String> sortOrders = sortOrder != null ? Arrays.asList(sortOrder.split(",")) : Collections.emptyList();
+
+        Comparator<Task> comparator = null;
+
+        for (int i = 0; i < sortFields.size(); i++) {
+            String field = sortFields.get(i);
+            boolean descending = i < sortOrders.size() && "desc".equalsIgnoreCase(sortOrders.get(i));
+
+            Comparator<Task> newComparator = null;
+            if ("priority".equalsIgnoreCase(field)) {
+                newComparator = Comparator.comparing(Task::getPriority);
+            } else if ("dueDate".equalsIgnoreCase(field)) {
+                newComparator = Comparator.comparing(Task::getDueDate, Comparator.nullsLast(Comparator.naturalOrder()));
+            }
+
+            if (newComparator != null) {
+                if (descending) newComparator = newComparator.reversed();
+                comparator = comparator == null ? newComparator : comparator.thenComparing(newComparator);
+            }
+        }
+
+        if (comparator != null){
+            sortedTasks.sort(comparator);
+        }
+
+        return sortedTasks;
+    }
+
     public void addTask(Task task){
     task.setId(idGenerator.getAndIncrement());
+
+    int daysAgo = (int) (Math.random() * 7) + 1;
+    task.setCreationDate(LocalDate.now().minusDays(daysAgo));
+
     tasks.add(task);
+
+//    if (task.getCreationDate() == null){
+//        task.setCreationDate(LocalDate.now());
+//    }
+//    tasks.add(task);
     }
 
     public void editTask(Long id, Task updatedTask){
@@ -39,7 +80,7 @@ public class TaskService {
             throw new IllegalArgumentException("Text cannot be empty");
         }
 
-        if(updatedTask.getDueDate().isBefore(updatedTask.getCreationDate())){
+        if(updatedTask.getDueDate() != null && updatedTask.getDueDate().isBefore(updatedTask.getCreationDate())){
             throw new IllegalArgumentException("Due date cannot be earlier than the creation date");
         }
 
@@ -124,10 +165,19 @@ public class TaskService {
         Task task = tasks.stream().filter(existingTask -> existingTask.getId().equals(id)).findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Task not found"));
 
-        if (!task.getDoneFlag()){
-            task.setDoneFlag(true);
-            task.setDoneDate(LocalDate.now());
+        if (task.getDoneFlag()){
+            return;
         }
+
+        task.setDoneFlag(true);
+
+        int daysAfter = (int) (Math.random() * 3) + 1;
+        task.setDoneDate(task.getCreationDate().plusDays(daysAfter));
+
+//        if (!task.getDoneFlag()){
+//            task.setDoneFlag(true);
+//            task.setDoneDate(LocalDate.now());
+//        }
     }
 
     public void markAsUndone(Long id){
