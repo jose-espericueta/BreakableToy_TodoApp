@@ -3,6 +3,8 @@ import React from "react";
 import AddTaskModal from "./AddTaskModal";
 import EditTaskModal from "./EditTaskModal";
 import api from "../services/api";
+import "./TaskList.css"
+import "./TaskList.css"
 
 interface Task{
     id: number;
@@ -39,7 +41,21 @@ interface TaskListProps{
     setFilterPriority: (filterPriority: string) => void;
     filterDone: string;
     setFilterDone: (filterDone: string) => void;
+    totalTasks: number;
+    pageSize: number;
 }
+
+const getRowColor = (dueDate?: string) => {
+    if (!dueDate) return "";
+
+    const today = new Date();
+    const due = new Date(dueDate);
+    const differenceInDays = Math.ceil((due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (differenceInDays <= 7) return "red-row";
+    if (differenceInDays <= 14) return "yellow-row";
+    return "green-row";
+};
 
 const TaskList: React.FC<TaskListProps> = ({
     tasks,
@@ -60,7 +76,9 @@ const TaskList: React.FC<TaskListProps> = ({
     filterPriority,
     setFilterPriority,
     filterDone,
-    setFilterDone
+    setFilterDone,
+    totalTasks,
+    pageSize
 }) => {
     const [showAddModal, setShowAddModal] = useState(false);
     const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
@@ -190,7 +208,7 @@ const TaskList: React.FC<TaskListProps> = ({
                         </tr>
                     ) : (
                         tasks.map((task) => (
-                            <tr key={task.id}>
+                            <tr key={task.id} className={getRowColor(task.dueDate)}>
                                 <td>
                                     <input
                                         type = "checkbox"
@@ -222,7 +240,12 @@ const TaskList: React.FC<TaskListProps> = ({
 
                 <span> Page {currentPage} </span>
 
-                <button onClick = {() => onPageChange(currentPage + 1)}>Next</button>
+                <button
+                    onClick = {() => onPageChange(currentPage + 1)}
+                    disabled = {currentPage * pageSize >= totalTasks}
+                >
+                    Next
+                </button>
             </div>
 
 

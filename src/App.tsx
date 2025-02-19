@@ -26,10 +26,14 @@ const App: React.FC = () => {
     const [filterText, setFilterText] = useState<string>("");
     const [filterPriority, setFilterPriority] = useState<string>("");
     const [filterDone, setFilterDone] = useState<string>("");
+    const [totalTasks, setTotalTasks] = useState<number>(0);
 
     const fetchTasks = useCallback(async (page: number = 1, size: number = 10) => {
         try{
-            const response = await api.get<Task[]>("/tasks/paginated", {
+            const allTaskResponse = await api.get<Task[]>("/tasks");
+            setTotalTasks(allTaskResponse.data.length);
+
+            const paginatedResponse = await api.get<Task[]>("/tasks/paginated", {
                 params: {
                     page,
                     size,
@@ -41,8 +45,8 @@ const App: React.FC = () => {
                 },
             });
 
-            console.log("API Response: ", response.data);
-            setTasks(response.data);
+            console.log("API Response: ", paginatedResponse.data);
+            setTasks(paginatedResponse.data);
         }catch(error){
             console.error("Error getting tasks", error);
         }
@@ -140,6 +144,8 @@ const App: React.FC = () => {
                 setFilterPriority = {setFilterPriority}
                 filterDone = {filterDone}
                 setFilterDone = {setFilterDone}
+                totalTasks = {totalTasks}
+                pageSize = {pageSize}
             />
         </div>
     );
