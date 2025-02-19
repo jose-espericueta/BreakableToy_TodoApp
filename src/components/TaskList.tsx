@@ -24,10 +24,21 @@ interface TaskListProps{
     onTaskAdded: (page?: number) => void;
     onTaskUpdated: () => void;
     onTaskDeleted: () => void;
-    fetchTasks: (page?: number) => void;
+    fetchTasks: (page?: number, pageSize?: number) => void;
+    applyFilters: () => void;
     metrics: TaskMetrics | null;
     currentPage: number;
     onPageChange: (page: number) => void;
+    sortBy: string | null;
+    setSortBy: (sortBy: string) => void;
+    sortOrder: string | null;
+    setSortOrder: (sortOrder: string) => void;
+    filterText: string;
+    setFilterText: (filterText: string) => void;
+    filterPriority: string;
+    setFilterPriority: (filterPriority: string) => void;
+    filterDone: string;
+    setFilterDone: (filterDone: string) => void;
 }
 
 const TaskList: React.FC<TaskListProps> = ({
@@ -36,37 +47,42 @@ const TaskList: React.FC<TaskListProps> = ({
     onTaskAdded,
     onTaskUpdated,
     onTaskDeleted,
-    fetchTasks,
+    applyFilters,
     metrics,
     currentPage,
-    onPageChange
+    onPageChange,
+    sortBy,
+    setSortBy,
+    sortOrder,
+    setSortOrder,
+    filterText,
+    setFilterText,
+    filterPriority,
+    setFilterPriority,
+    filterDone,
+    setFilterDone
 }) => {
     const [showAddModal, setShowAddModal] = useState(false);
     const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
 
-    const [filterText, setFilterText] = useState("");
-    const [filterPriority, setFilterPriority] = useState("");
-    const [filterDone, setFilterDone] = useState("");
-
-    const [sortBy, setSortBy] = useState<string | null>(null);
-    const[sortOrder, setSortOrder] = useState<string>("asc");
-
-    const fetchFilteredTasks = async () => {
-        try{
-            const response = await api.get("/tasks/filter", {
+    const fetchTasks = async (page: number = 1, size: number = 10) => {
+        try {
+            const response = await api.get<Task>("/tasks/paginated", {
                 params: {
+                    page,
+                    size,
                     filterByText: filterText || undefined,
                     filterByPriority: filterPriority || undefined,
                     filterByDoneFlag: filterDone === "" ? undefined : filterDone === "true",
-                    sortBy: sortOrder || undefined,
-                    sortOrder: sortOrder || undefined,
+                    sortBy: sortBy || undefined,
+                    sortOrder: sortOrder || undefined
                 },
             });
 
+            console.log("API Response: ", response.data);
             fetchTasks();
-
-        }catch(error) {
-            console.error("Error fetching filtered tasks", error);
+        }catch(error){
+            console.error("Error getting tasks", error);
         }
     };
 
@@ -91,31 +107,6 @@ const TaskList: React.FC<TaskListProps> = ({
 
         setSortBy(updatedSortBy);
         setSortOrder(updatedSortOrder);
-
-        fetchTasks(1, 10);
-
-//         if(newSortBy.length > newSortOrder.length){
-//             newSortOrder.push("asc");
-//         }else if(newSortBy.length < newSortOrder.length){
-//             newSortOrder.pop();
-//         }
-//
-//         const updatedSortBy = newSortBy.join(",");
-//         const updatedSortOrder = newSortOrder.join(",");
-//
-//         setSortBy(updatedSortBy);
-//         setSortOrder(updatedSortOrder);
-//
-//         try{
-//             const response = await api.get("/tasks", {
-//                 params: { sortBy: updatedSortBy, sortOrder: updatedSortOrder },
-//             });
-//
-//             fetchTasks();
-//
-//         }catch(error){
-//             console.error("Error fetching sorted tasks: ", error);
-//         }
     };
 
     const deleteTask = async (id: number) => {
@@ -169,7 +160,7 @@ const TaskList: React.FC<TaskListProps> = ({
                     <option value="false">undone</option>
                 </select>
 
-                <button onClick={fetchFilteredTasks}>Apply Filters</button>
+                <button onClick={applyFilters}>Apply Filters</button>
             </div>
 
             <table style={{ border: "1px solid black", borderCollapse: "collapse" }}>

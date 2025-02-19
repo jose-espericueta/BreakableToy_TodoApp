@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import TaskList from "./components/TaskList";
 import api from "./services/api";
 
@@ -19,17 +19,23 @@ interface TaskMetrics{
 const App: React.FC = () => {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [metrics, setMetrics] = useState<TaskMetrics | null>(null);
-    const [sortBy, setSortBy] = useState<String | null>(null);
-    const [sortOrder, setSortOrder] = useState<String | null>(null);
+    const [sortBy, setSortBy] = useState<string | null>(null);
+    const [sortOrder, setSortOrder] = useState<string | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const pageSize = 10;
+    const [filterText, setFilterText] = useState<string>("");
+    const [filterPriority, setFilterPriority] = useState<string>("");
+    const [filterDone, setFilterDone] = useState<string>("");
 
-    const fetchTasks = async (page: number = 1, size: number = 10) => {
+    const fetchTasks = useCallback(async (page: number = 1, size: number = 10) => {
         try{
             const response = await api.get<Task[]>("/tasks/paginated", {
                 params: {
                     page,
                     size,
+                    filterByText: filterText || undefined,
+                    filterByPriority: filterPriority || undefined,
+                    filterByDoneFlag: filterDone === "" ? undefined : filterDone === "true",
                     sortBy: sortBy || undefined,
                     sortOrder: sortOrder || undefined
                 },
@@ -39,6 +45,27 @@ const App: React.FC = () => {
             setTasks(response.data);
         }catch(error){
             console.error("Error getting tasks", error);
+        }
+    }, [filterText, filterPriority, filterDone, sortBy, sortOrder]);
+
+    const applyFilters = async () => {
+        try {
+            const response = await api.get<Task[]>("/tasks/paginated", {
+                params: {
+                    page: 1,
+                    size: pageSize,
+                    filterByText: filterText || undefined,
+                    filterByPriority: filterPriority || undefined,
+                    filterByDoneFlag: filterDone === "" ? undefined : filterDone === "true",
+                    sortBy: sortBy || undefined,
+                    sortOrder: sortOrder || undefined
+                }
+            });
+
+            console.log("Filtered Tasks Response: ", response.data);
+            setTasks(response.data);
+        } catch (error) {
+            console.error("Error applying filters", error);
         }
     };
 
@@ -51,10 +78,18 @@ const App: React.FC = () => {
         }
     };
 
+    const handlePageChange = (newPage: number) => {
+        if(newPage < 1) return;
+        setCurrentPage(newPage);
+    };
+
     useEffect(() => {
         fetchTasks(currentPage, pageSize);
+    }, [currentPage, fetchTasks]);
+
+    useEffect(() => {
         fetchMetrics();
-    }, [currentPage, sortBy, sortOrder]);
+    }, []);
 
     const markTaskAsDone = async (id: number) => {
 
@@ -95,9 +130,16 @@ const App: React.FC = () => {
                 sortOrder = {sortOrder}
                 setSortOrder = {setSortOrder}
                 fetchTasks = {fetchTasks}
+                applyFilters = {applyFilters}
                 metrics = {metrics}
                 currentPage = {currentPage}
-                onPageChange = {fetchTasks}
+                onPageChange = {handlePageChange}
+                filterText = {filterText}
+                setFilterText = {setFilterText}
+                filterPriority = {filterPriority}
+                setFilterPriority = {setFilterPriority}
+                filterDone = {filterDone}
+                setFilterDone = {setFilterDone}
             />
         </div>
     );
