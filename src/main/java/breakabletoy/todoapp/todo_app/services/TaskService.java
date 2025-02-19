@@ -61,15 +61,15 @@ public class TaskService {
     public void addTask(Task task){
     task.setId(idGenerator.getAndIncrement());
 
-    int daysAgo = (int) (Math.random() * 7) + 1;
-    task.setCreationDate(LocalDate.now().minusDays(daysAgo));
-
-    tasks.add(task);
-
-//    if (task.getCreationDate() == null){
-//        task.setCreationDate(LocalDate.now());
-//    }
+//    int daysAgo = (int) (Math.random() * 7) + 1;
+//    task.setCreationDate(LocalDate.now().minusDays(daysAgo));
+//
 //    tasks.add(task);
+
+        if (task.getCreationDate() == null){
+            task.setCreationDate(LocalDate.now());
+        }
+        tasks.add(task);
     }
 
     public void editTask(Long id, Task updatedTask){
@@ -104,19 +104,19 @@ public class TaskService {
         }
     }
 
-    public List<Task> getPaginatedTasks(int page, int size){
+    public List<Task> getPaginatedTasks(List<Task> tasksToPaginate, int page, int size){
         if (page < 1 || size < 1){
             throw new IllegalArgumentException("Page and size must be greater than 0");
         }
         int startIndex = (page - 1) * size;
 
-        if(startIndex >= tasks.size()){
+        if(startIndex >= tasksToPaginate.size()){
             return Collections.emptyList();
         }
 
-        int endIndex = Math.min(tasks.size(), startIndex + size);
+        int endIndex = Math.min(tasksToPaginate.size(), startIndex + size);
 
-        return tasks.subList(startIndex, endIndex);
+        return tasksToPaginate.subList(startIndex, endIndex);
     }
 
     public List<Task> filterTasks(String filterByText, Priority filterByPriority, Boolean filterByDoneFlag) {
@@ -165,19 +165,19 @@ public class TaskService {
         Task task = tasks.stream().filter(existingTask -> existingTask.getId().equals(id)).findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Task not found"));
 
-        if (task.getDoneFlag()){
-            return;
-        }
-
-        task.setDoneFlag(true);
-
-        int daysAfter = (int) (Math.random() * 3) + 1;
-        task.setDoneDate(task.getCreationDate().plusDays(daysAfter));
-
-//        if (!task.getDoneFlag()){
-//            task.setDoneFlag(true);
-//            task.setDoneDate(LocalDate.now());
+//        if (task.getDoneFlag()){
+//            return;
 //        }
+
+//        task.setDoneFlag(true);
+//
+//        int daysAfter = (int) (Math.random() * 3) + 1;
+//        task.setDoneDate(task.getCreationDate().plusDays(daysAfter));
+
+        if (!task.getDoneFlag()){
+            task.setDoneFlag(true);
+            task.setDoneDate(LocalDate.now());
+        }
     }
 
     public void markAsUndone(Long id){

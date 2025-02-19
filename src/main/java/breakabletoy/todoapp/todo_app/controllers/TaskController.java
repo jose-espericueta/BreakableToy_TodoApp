@@ -47,6 +47,9 @@ public class TaskController {
     @GetMapping("/paginated")
     public List<Task> getPaginatedTasks(@RequestParam(required = false) String sortBy,
                                         @RequestParam(required = false) String sortOrder,
+                                        @RequestParam(required = false) String filterByText,
+                                        @RequestParam(required = false) Priority filterByPriority,
+                                        @RequestParam(required = false) Boolean filterByDoneFlag,
                                         @RequestParam(defaultValue = "1") int page,
                                         @RequestParam(defaultValue = "10") int size){
 
@@ -54,8 +57,11 @@ public class TaskController {
             throw new IllegalArgumentException("Page and size must be greater than 0");
         }
 
-        List<Task> tasks = taskService.getPaginatedTasks(page, size);
-        return taskService.sortedTasks(tasks, sortBy, sortOrder);
+        List<Task> filteredTasks = taskService.filterTasks(filterByText, filterByPriority, filterByDoneFlag);
+
+        List<Task> getPaginatedTasks = taskService.getPaginatedTasks(filteredTasks, page, size);
+
+        return taskService.sortedTasks(getPaginatedTasks, sortBy, sortOrder);
 
     }
 
