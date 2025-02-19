@@ -17,12 +17,25 @@ interface TaskMetrics{
 }
 
 const App: React.FC = () => {
-    const[tasks, setTasks] = useState<Task[]>([]);
-    const[metrics, setMetrics] = useState<TaskMetrics | null>(null);
+    const [tasks, setTasks] = useState<Task[]>([]);
+    const [metrics, setMetrics] = useState<TaskMetrics | null>(null);
+    const [sortBy, setSortBy] = useState<String | null>(null);
+    const [sortOrder, setSortOrder] = useState<String | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const pageSize = 10;
 
-    const fetchTasks = async () => {
+    const fetchTasks = async (page: number = 1, size: number = 10) => {
         try{
-            const response = await api.get<Task[]>("/tasks");
+            const response = await api.get<Task[]>("/tasks/paginated", {
+                params: {
+                    page,
+                    size,
+                    sortBy: sortBy || undefined,
+                    sortOrder: sortOrder || undefined
+                },
+            });
+
+            console.log("API Response: ", response.data);
             setTasks(response.data);
         }catch(error){
             console.error("Error getting tasks", error);
@@ -39,9 +52,9 @@ const App: React.FC = () => {
     };
 
     useEffect(() => {
-        fetchTasks();
+        fetchTasks(currentPage, pageSize);
         fetchMetrics();
-    }, []);
+    }, [currentPage, sortBy, sortOrder]);
 
     const markTaskAsDone = async (id: number) => {
 
@@ -74,11 +87,17 @@ const App: React.FC = () => {
             <TaskList
                 tasks = {tasks}
                 markTaskAsDone = {markTaskAsDone}
-                onTaskAdded = {fetchTasks}
-                onTaskUpdated = {fetchTasks}
-                onTaskDeleted = {fetchTasks}
+                onTaskAdded = {() => fetchTasks(currentPage, pageSize)}
+                onTaskUpdated = {() => fetchTasks(currentPage, pageSize)}
+                onTaskDeleted = {() => fetchTasks(currentPage, pageSize)}
+                sortBy = {sortBy}
+                setSortBy = {setSortBy}
+                sortOrder = {sortOrder}
+                setSortOrder = {setSortOrder}
                 fetchTasks = {fetchTasks}
-                metrics={metrics}
+                metrics = {metrics}
+                currentPage = {currentPage}
+                onPageChange = {fetchTasks}
             />
         </div>
     );

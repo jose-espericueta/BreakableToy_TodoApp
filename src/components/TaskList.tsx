@@ -21,14 +21,26 @@ interface TaskMetrics{
 interface TaskListProps{
     tasks: Task[];
     markTaskAsDone: (id: number) => void;
-    onTaskAdded: () => void;
+    onTaskAdded: (page?: number) => void;
     onTaskUpdated: () => void;
     onTaskDeleted: () => void;
-    fetchTasks: (params?: object) => void;
+    fetchTasks: (page?: number) => void;
     metrics: TaskMetrics | null;
+    currentPage: number;
+    onPageChange: (page: number) => void;
 }
 
-const TaskList: React.FC<TaskListProps> = ({ tasks, markTaskAsDone, onTaskAdded, onTaskUpdated, onTaskDeleted, fetchTasks, metrics }) => {
+const TaskList: React.FC<TaskListProps> = ({
+    tasks,
+    markTaskAsDone,
+    onTaskAdded,
+    onTaskUpdated,
+    onTaskDeleted,
+    fetchTasks,
+    metrics,
+    currentPage,
+    onPageChange
+}) => {
     const [showAddModal, setShowAddModal] = useState(false);
     const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
 
@@ -51,7 +63,7 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, markTaskAsDone, onTaskAdded,
                 },
             });
 
-            fetchTasks(response.data);
+            fetchTasks();
 
         }catch(error) {
             console.error("Error fetching filtered tasks", error);
@@ -72,28 +84,38 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, markTaskAsDone, onTaskAdded,
             newSortOrder.push("asc");
         }
 
-        if(newSortBy.length > newSortOrder.length){
-            newSortOrder.push("asc");
-        }else if(newSortBy.length < newSortOrder.length){
-            newSortOrder.pop();
-        }
-
         const updatedSortBy = newSortBy.join(",");
         const updatedSortOrder = newSortOrder.join(",");
+
+        console.log(`Sorting by: ${updatedSortBy}, Order: ${updatedSortOrder}`);
 
         setSortBy(updatedSortBy);
         setSortOrder(updatedSortOrder);
 
-        try{
-            const response = await api.get("/tasks", {
-                params: { sortBy: updatedSortBy, sortOrder: updatedSortOrder },
-            });
+        fetchTasks(1, 10);
 
-            fetchTasks(response.data);
-
-        }catch(error){
-            console.error("Error fetching sorted tasks: ", error);
-        }
+//         if(newSortBy.length > newSortOrder.length){
+//             newSortOrder.push("asc");
+//         }else if(newSortBy.length < newSortOrder.length){
+//             newSortOrder.pop();
+//         }
+//
+//         const updatedSortBy = newSortBy.join(",");
+//         const updatedSortOrder = newSortOrder.join(",");
+//
+//         setSortBy(updatedSortBy);
+//         setSortOrder(updatedSortOrder);
+//
+//         try{
+//             const response = await api.get("/tasks", {
+//                 params: { sortBy: updatedSortBy, sortOrder: updatedSortOrder },
+//             });
+//
+//             fetchTasks();
+//
+//         }catch(error){
+//             console.error("Error fetching sorted tasks: ", error);
+//         }
     };
 
     const deleteTask = async (id: number) => {
@@ -113,7 +135,9 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, markTaskAsDone, onTaskAdded,
         <div>
             <button onClick={() => setShowAddModal(true)}>New Task</button>
 
-            {showAddModal && <AddTaskModal onClose={() => setShowAddModal(false)} onTaskAdded={onTaskAdded} />}
+            {showAddModal && (
+                <AddTaskModal onClose={() => setShowAddModal(false)} onTaskAdded={() => onTaskAdded(currentPage)} />
+            )}
 
             {taskToEdit && (
                 <EditTaskModal
@@ -200,19 +224,31 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, markTaskAsDone, onTaskAdded,
                 </tbody>
             </table>
 
+            <div>
+                <button onClick = {() => onPageChange(currentPage - 1)} disabled = {currentPage === 1}>
+                    Previous
+                </button>
+
+                <span> Page {currentPage} </span>
+
+                <button onClick = {() => onPageChange(currentPage + 1)}>Next</button>
+            </div>
+
+
             {metrics && (
                 <div>
                     <h2>Metrics</h2>
-                    <p><strong>Average Completion Time: </strong> {metrics.averageCompletionTime.toFixed(2)} days</p>
+                    <p>
+                        <strong>Average Completion Time: </strong> {metrics.averageCompletionTime.toFixed(2)} days
+                    </p>
                     <h3>Average Completion time by Priority: </h3>
                     <ul>
-                        <li><strong>High: </strong> {metrics.averageTimeByPriority.High.toFixed(2)} days</li>
-                        <li><strong>Medium: </strong> {metrics.averageTimeByPriority.Medium.toFixed(2)} days</li>
-                        <li><strong>Low: </strong> {metrics.averageTimeByPriority.Low.toFixed(2)} days</li>
+                        <li><strong>High: </strong> {(metrics.averageTimeByPriority.High ?? 0).toFixed(2)} days</li>
+                        <li><strong>Medium: </strong> {(metrics.averageTimeByPriority.Medium ?? 0).toFixed(2)} days</li>
+                        <li><strong>Low: </strong> {(metrics.averageTimeByPriority.Low ?? 0).toFixed(2)} days</li>
                     </ul>
                 </div>
             )}
-
         </div>
     );
 };
