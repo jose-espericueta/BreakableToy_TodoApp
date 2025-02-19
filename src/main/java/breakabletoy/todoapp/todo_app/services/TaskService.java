@@ -69,6 +69,11 @@ public class TaskService {
         if (task.getCreationDate() == null){
             task.setCreationDate(LocalDate.now());
         }
+
+        if(task.getDoneFlag() == null){
+            task.setDoneFlag(false);
+        }
+
         tasks.add(task);
     }
 
@@ -80,7 +85,8 @@ public class TaskService {
             throw new IllegalArgumentException("Text cannot be empty");
         }
 
-        if(updatedTask.getDueDate() != null && updatedTask.getDueDate().isBefore(updatedTask.getCreationDate())){
+        if(updatedTask.getDueDate() != null && updatedTask.getCreationDate() != null &&
+                updatedTask.getDueDate().isBefore(updatedTask.getCreationDate())){
             throw new IllegalArgumentException("Due date cannot be earlier than the creation date");
         }
 
