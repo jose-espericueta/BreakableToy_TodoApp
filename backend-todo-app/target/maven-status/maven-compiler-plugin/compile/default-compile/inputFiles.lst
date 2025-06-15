@@ -1,0 +1,8 @@
+/Users/jose.espericueta/Documents/Intellij Projects/backend-todo-app/src/main/java/breakabletoy/todoapp/todo_app/Priority.java
+/Users/jose.espericueta/Documents/Intellij Projects/backend-todo-app/src/main/java/breakabletoy/todoapp/todo_app/TodoAppApplication.java
+/Users/jose.espericueta/Documents/Intellij Projects/backend-todo-app/src/main/java/breakabletoy/todoapp/todo_app/config/CorsConfig.java
+/Users/jose.espericueta/Documents/Intellij Projects/backend-todo-app/src/main/java/breakabletoy/todoapp/todo_app/controllers/TaskController.java
+/Users/jose.espericueta/Documents/Intellij Projects/backend-todo-app/src/main/java/breakabletoy/todoapp/todo_app/dto/TaskMetricsDTO.java
+/Users/jose.espericueta/Documents/Intellij Projects/backend-todo-app/src/main/java/breakabletoy/todoapp/todo_app/repository/TaskRepository.java
+/Users/jose.espericueta/Documents/Intellij Projects/backend-todo-app/src/main/java/breakabletoy/todoapp/todo_app/services/TaskService.java
+/Users/jose.espericueta/Documents/Intellij Projects/backend-todo-app/src/main/java/breakabletoy/todoapp/todo_app/task/Task.java

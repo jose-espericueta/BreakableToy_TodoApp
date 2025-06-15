@@ -1,0 +1,8 @@
+breakabletoy/todoapp/todo_app/TodoAppApplication.class
+breakabletoy/todoapp/todo_app/task/Task.class
+breakabletoy/todoapp/todo_app/dto/TaskMetricsDTO.class
+breakabletoy/todoapp/todo_app/config/CorsConfig.class
+breakabletoy/todoapp/todo_app/config/CorsConfig$1.class
+breakabletoy/todoapp/todo_app/services/TaskService.class
+breakabletoy/todoapp/todo_app/controllers/TaskController.class
+breakabletoy/todoapp/todo_app/Priority.class
