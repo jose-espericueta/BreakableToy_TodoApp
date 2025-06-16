@@ -1,0 +1,231 @@
+/* App.css */
+
+/* Define global theme colors */
+:root {
+  --primary-color: #4a90e2;
+  --primary-hover: #357ABD;
+}
+
+/* Base body styles for layout and typography */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f4f4;
+  display: grid;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  margin: 0;
+}
+
+/* Main application container styling */
+.container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 30px 40px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Header title styling */
+h1 {
+  font-size: 2.8rem;
+  color: #2c3e50;
+  margin-bottom: 35px;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* Layout for top control bar (filters, buttons, etc.) */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+/* Base button style */
+button {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+/* Button hover effect for primary buttons */
+button:hover {
+  background-color: var(--primary-hover);
+}
+
+/* Specific styles for edit buttons */
+button.edit {
+  background-color: #3498db;
+}
+
+button.edit:hover {
+  background-color: #2980b9;
+}
+
+/* Specific styles for delete buttons */
+button.delete {
+  background-color: #e74c3c;
+}
+
+button.delete:hover {
+  background-color: #c0392b;
+}
+
+/* Base input and select styling */
+input[type="text"],
+select {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 15px;
+  background-color: #fdfdfd;
+}
+
+/* Input and select focus styles */
+input:focus,
+select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
+/* Responsive scrollable table wrapper */
+.table-container {
+  overflow-x: auto;
+  width: 100%;
+}
+
+/* Base table styles */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 25px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* Table cell and header spacing and transitions */
+th,
+td {
+  padding: 14px 15px;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Header cell styles */
+th {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+/* Rounded corners for first and last header cells */
+th:first-child {
+  border-top-left-radius: 10px;
+}
+
+th:last-child {
+  border-top-right-radius: 10px;
+}
+
+/* Alternating row background color */
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* Row hover effect */
+tr:hover {
+  background-color: #f1f7ff;
+}
+
+/* Metrics section styling */
+.metrics {
+  margin-top: 30px;
+  padding: 20px;
+  background-color: #f1f3f6;
+  border-radius: 10px;
+  text-align: left;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Modal overlay background */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Modal content box styling */
+.modal-content {
+  background-color: white;
+  padding: 30px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+/* Modal title */
+.modal-content h3 {
+  margin-top: 0;
+}
+
+/* Form layout inside modal */
+.modal-content form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Form inputs inside modal */
+.modal-content input,
+.modal-content select {
+  padding: 8px;
+  font-size: 16px;
+}
+
+/* Modal submit or action button */
+.modal-content button {
+  width: fit-content;
+  align-self: flex-start;
+}
+
+/* Button group inside modal footer */
+.modal-buttons {
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* Smooth transitions for interactive elements */
+button,
+input,
+select,
+tr,
+th,
+td {
+  transition: all 0.3s ease;
+}
+
+/* Transition for task list items */
+.task-item {
+  transition: background-color 0.2s ease;
+}
